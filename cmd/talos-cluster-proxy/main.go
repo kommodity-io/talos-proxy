@@ -28,7 +28,7 @@ func main() {
 	if err != nil {
 		logger, logErr := buildLogger("info")
 		if logErr != nil {
-			fmt.Fprintf(os.Stderr, "fatal error: %v\n", err)
+			fmt.Fprintf(os.Stderr, "fatal error: %v (logger init failed: %v)\n", err, logErr)
 			os.Exit(1)
 		}
 
