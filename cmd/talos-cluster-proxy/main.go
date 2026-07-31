@@ -11,6 +11,7 @@ import (
 	"syscall"
 
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/kommodity-io/talos-cluster-proxy/internal/proxy"
 )
@@ -25,7 +26,12 @@ const (
 func main() {
 	err := run()
 	if err != nil {
-		logger, _ := zap.NewProduction()
+		logger, logErr := buildLogger("info")
+		if logErr != nil {
+			fmt.Fprintf(os.Stderr, "fatal error: %v (logger init failed: %v)\n", err, logErr)
+			os.Exit(1)
+		}
+
 		logger.Error("fatal error", zap.Error(err))
 		os.Exit(1)
 	}
@@ -96,6 +102,7 @@ func buildLogger(logLevel string) (*zap.Logger, error) {
 
 	cfg := zap.NewProductionConfig()
 	cfg.Level = level
+	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 
 	logger, err := cfg.Build()
 	if err != nil {
